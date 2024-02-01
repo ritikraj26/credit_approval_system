@@ -11,13 +11,17 @@ class Customer(models.Model):
     approved_limit = models.DecimalField(max_digits=10, decimal_places=2)
     current_debt = models.DecimalField(max_digits=10, decimal_places=2)
 
+    def get_current_debt(self):
+        loans = Loan.objects.filter(customer_id=self.customer_id)
+        current_debt = sum(loan.get_remaining_amount() for loan in loans)
+        return current_debt
 
     def __str__(self):
         return f"{self.first_name}{self.last_name}"
     
 
 class Loan(models.Model):
-    customer_id = models.IntegerField()
+    customer_id = models.IntegerField()   
     loan_id = models.AutoField(primary_key=True)
     loan_amount = models.DecimalField(max_digits=10, decimal_places=2)
     tenure = models.IntegerField()
@@ -27,7 +31,16 @@ class Loan(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
 
+    def get_remaining_amount(self):
+        remaining_amount = self.loan_amount
+        for emi_number in range(1, self.emis_paid_on_time+1):
+            interest_payment = remaining_amount * self.interest_rate / 12 / 100
+            principal_payment = self.monthly_repayment - interest_payment
+            remaining_amount -= principal_payment
+        
+        return max(0, remaining_amount)
+
     def __str__(self):
-        return f"Loan #{self.loan_id} for {self.customer}"
+        return f"Loan #{self.loan_id}"
 
 
