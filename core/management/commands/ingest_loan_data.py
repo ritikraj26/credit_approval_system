@@ -10,7 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            loan_data = pd.read_excel('loan_data.xlsx')
+            loan_data = pd.read_excel('files/loan_data.xlsx')
 
             for _, row in loan_data.iterrows():
                 loan_id = int(row.get('Loan ID'))

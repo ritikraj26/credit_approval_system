@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,7 @@ SECRET_KEY = "django-insecure-2m)$$r7the1o^zt0v&uuv53dzjsn%3prk5l16(oljqd+)!ro=*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -69,6 +70,7 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = "credit_approval_system.wsgi.application"
 
 
@@ -81,7 +83,7 @@ DATABASES = {
         "NAME": "alemeno_assignment",
         "USER": "tester",
         "PASSWORD": "tester",
-        "HOST": "localhost",
+        "HOST": "db",
         "PORT": "5432",
     }
 }

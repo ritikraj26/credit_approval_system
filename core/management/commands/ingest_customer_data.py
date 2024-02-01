@@ -10,8 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            customer_data = pd.read_excel('customer_data.xlsx')
-            loan_data = pd.read_excel('loan_data.xlsx')
+            customer_data = pd.read_excel('files/customer_data.xlsx')
 
             print(customer_data)
             for _, row in customer_data.iterrows():
