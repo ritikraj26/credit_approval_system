@@ -19,16 +19,4 @@ class CheckEligibilitySerializer(serializers.Serializer):
     interest_rate = serializers.FloatField()
     tenure = serializers.IntegerField()
 
-class CreateLoanRequestSerializer(serializers.Serializer):
-    customer_id = serializers.IntegerField()
-    loan_amount = serializers.FloatField()
-    interest_rate = serializers.FloatField()
-    tenure = serializers.IntegerField()
-
-class CreateLoanResponseSerializer(serializers.Serializer):
-    loan_id = serializers.IntegerField()
-    customer_id = serializers.IntegerField()
-    loan_approved = serializers.BooleanField()
-    message = serializers.CharField(max_length=255)
-    monthly_installment = serializers.FloatField()
 

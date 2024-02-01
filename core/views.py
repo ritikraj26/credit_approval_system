@@ -6,7 +6,8 @@ from .models import Customer, Loan
 from .serializers import RegisterCustomerSerializer, CustomerResponseSerializer, CheckEligibilitySerializer
 from .utils import CheckEligibilityUtils
 
-class RegisterCustomerView(APIView):
+
+class RegisterCustomer(APIView):
     def post(self, request, format=None):
         serializer = RegisterCustomerSerializer(data=request.data)
         
@@ -32,7 +33,8 @@ class RegisterCustomerView(APIView):
 def calculate_approved_limit(monthly_income):
     return round(monthly_income * 36, -5)
 
-class CheckEligibilityView(APIView):
+
+class CheckEligibility(APIView):
     def get(self, request, format=None):
         serializer = CheckEligibilitySerializer(data=request.data)
         if serializer.is_valid():
@@ -61,9 +63,7 @@ class CheckEligibilityView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     
-
-
-class CreateLoanView(APIView):
+class CreateLoan(APIView):
     def post(self, request, format=None):
         serializer = CheckEligibilitySerializer(data=request.data)
         if serializer.is_valid():
@@ -109,7 +109,7 @@ class CreateLoanView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-class ViewLoanView(APIView):
+class ViewLoan(APIView):
     def get(self, request, loan_id, format=None):
         loan = Loan.objects.get(loan_id=loan_id)
         if loan is None:
@@ -132,8 +132,9 @@ class ViewLoanView(APIView):
         }
 
         return Response(response_data, status=status.HTTP_200_OK)
+   
     
-class ViewLoansView(APIView):
+class ViewLoans(APIView):
     def get(self, request, customer_id, format=None):
         loans = Loan.objects.filter(customer_id=customer_id)
         if loans is None:
