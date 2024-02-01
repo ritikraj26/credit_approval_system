@@ -43,4 +43,3 @@ class Loan(models.Model):
     def __str__(self):
         return f"Loan #{self.loan_id}"
 
-
