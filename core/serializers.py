@@ -15,8 +15,8 @@ class CustomerResponseSerializer(serializers.ModelSerializer):
 
 class CheckEligibilitySerializer(serializers.Serializer):
     customer_id = serializers.IntegerField()
-    loan_amount = serializers.FloatField()
-    interest_rate = serializers.FloatField()
+    loan_amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    interest_rate = serializers.DecimalField(max_digits=5, decimal_places=2)
     tenure = serializers.IntegerField()
 
 

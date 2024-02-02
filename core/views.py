@@ -21,7 +21,7 @@ class RegisterCustomer(APIView):
                 approved_limit=0,
                 current_debt=0,
             )
-
+            print(customer)
             customer.approved_limit = calculate_approved_limit(customer.monthly_salary)
             customer.save()
 
@@ -114,17 +114,18 @@ class ViewLoan(APIView):
         loan = Loan.objects.get(loan_id=loan_id)
         if loan is None:
             return Response("Loan does not exist", status=status.HTTP_400_BAD_REQUEST)
-
-        customer = {
-            'customer_id': loan.customer_id,
-            'first_name': loan.first_name,
-            'last_name': loan.last_name,
-            'age': loan.age,
-            'phone_number': loan.phone_number
+        customer_id = loan.customer_id
+        customer = Customer.objects.get(customer_id=customer_id)
+        customer_data = {
+            'customer_id': customer_id,
+            'first_name': customer.first_name,
+            'last_name': customer.last_name,
+            'age': customer.age,
+            'phone_number': customer.phone_number
         }
         response_data = {
             'loan_id': loan.loan_id,
-            'customer': customer,
+            'customer': customer_data,
             'loan_amount': loan.loan_amount,
             'interest_rate': loan.interest_rate,
             'monthly_installment': loan.monthly_repayment,
@@ -132,30 +133,34 @@ class ViewLoan(APIView):
         }
 
         return Response(response_data, status=status.HTTP_200_OK)
-   
-    
+
+
 class ViewLoans(APIView):
     def get(self, request, customer_id, format=None):
         loans = Loan.objects.filter(customer_id=customer_id)
         if loans is None:
             return Response("Customer does not exist", status=status.HTTP_400_BAD_REQUEST)
 
-        response_data = []
+        customer = Customer.objects.get(customer_id=customer_id)
+        customer_data = {
+            'customer_id': customer_id,
+            'first_name': customer.first_name,
+            'last_name': customer.last_name,
+            'age': customer.age,
+            'phone_number': customer.phone_number
+        }
+        response_subdata = []
         for loan in loans:
-            customer = {
-                'customer_id': loan.customer_id,
-                'first_name': loan.first_name,
-                'last_name': loan.last_name,
-                'age': loan.age,
-                'phone_number': loan.phone_number
-            }
-            response_data.append({
+            
+            response_subdata.append({
                 'loan_id': loan.loan_id,
-                'customer': customer,
                 'loan_amount': loan.loan_amount,
                 'interest_rate': loan.interest_rate,
                 'monthly_installment': loan.monthly_repayment,
                 'tenure': loan.tenure,
             })
-
+        response_data = {
+            'customer': customer_data,
+            'loans': response_subdata,
+        }
         return Response(response_data, status=status.HTTP_200_OK)

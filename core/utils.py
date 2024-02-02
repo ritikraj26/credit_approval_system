@@ -1,10 +1,12 @@
+from decimal import Decimal
 from .models import Customer, Loan
 import datetime
+from .credit import generate_credit_rating
 
 class CheckEligibilityUtils:
     
     @staticmethod
-    def check_loan_eligibility(  customer_id, interest_rate):
+    def check_loan_eligibility(customer_id, interest_rate):
         
         approval = False
         credit_rating = CheckEligibilityUtils.calculate_credit_rating(customer_id)
@@ -34,24 +36,14 @@ class CheckEligibilityUtils:
         return approval, corrected_interest_rate
     
     @staticmethod
-    def calculate_credit_rating( customer_id):
+    def calculate_credit_rating(customer_id):
         
         past_loans_paid_on_time = CheckEligibilityUtils.get_past_loans_paid_on_time(customer_id)
         number_of_loans_taken = CheckEligibilityUtils.get_number_of_loans_taken(customer_id)
         loan_activity_in_current_year = CheckEligibilityUtils.get_loan_activity_in_current_year(customer_id)
         loan_approved_volume = CheckEligibilityUtils.get_loan_approved_volume(customer_id)
 
-        weight_past_loans_paid_on_time = 0.4
-        weight_number_of_loans_taken = 0.3
-        weight_loan_activity_in_current_year = 0.2
-        weight_loan_approved_volume = 0.1
-
-        credit_rating = (
-            (past_loans_paid_on_time * weight_past_loans_paid_on_time) +
-            (number_of_loans_taken * weight_number_of_loans_taken) +
-            (loan_activity_in_current_year * weight_loan_activity_in_current_year) +
-            (loan_approved_volume * weight_loan_approved_volume)
-        )
+        credit_rating = generate_credit_rating(past_loans_paid_on_time, number_of_loans_taken, loan_activity_in_current_year, loan_approved_volume)
 
         customer = Customer.objects.get(customer_id=customer_id)
         if customer.get_current_debt() > customer.approved_limit:
@@ -78,11 +70,15 @@ class CheckEligibilityUtils:
 
     @staticmethod
     def get_loan_approved_volume( customer_id):
-        return Loan.objects.filter(customer_id=customer_id).count()
+        loans = Loan.objects.filter(customer_id=customer_id)
+        approved_volume = 0
+        for loan in loans:
+            approved_volume += loan.loan_amount
+        return approved_volume
 
     @staticmethod
     def calculate_emi(principal, annual_interest_rate, tenure_in_years):
-        monthly_interest_rate = (annual_interest_rate / 12) * 0.01
+        monthly_interest_rate = (annual_interest_rate / Decimal(12))
         tenure_in_months = tenure_in_years * 12
         emi = (principal * monthly_interest_rate * (1 + monthly_interest_rate) ** tenure_in_months) / \
             (((1 + monthly_interest_rate) ** tenure_in_months) - 1)
